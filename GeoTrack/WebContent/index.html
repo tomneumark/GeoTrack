@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>GeoTrack</title>
+
+		<script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.5/mapbox.js'></script>
+		<script src='js/jquery-1.11.2.min.js'></script>
+		<link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.5/mapbox.css' rel='stylesheet' />
+		<link href='css/styles.css' rel='stylesheet' />
+    </head>
+    <body>
+    	<div id='map'></div>
+    	<div id='phoneList'><input type='text' name='id'/></div>
+    	<script>
+    		L.mapbox.accessToken = 'pk.eyJ1IjoidGhvbWFzbmV1bWFyayIsImEiOiJTZFY2TXZZIn0.5hOvpw6sJzpy6dadADxYQg';
+    	    var map = L.mapbox.map('map', 'thomasneumark.l968pfd5').setView([38.797, -77.36], 9);
+
+    	    var marker = null;
+			var polyline = L.polyline([]).addTo(map);
+
+			window.setInterval(function() {
+			    updateCurrentLatLng();
+			}, 1000 );
+
+			function updateCurrentLatLng() {
+			   	$.ajax({
+			   		url: "current.jsp",
+			   		type: "GET",
+			   		dataType: "json",
+			   		success: function(json) {
+			   			console.log("(Lat,Lng) is (" + json.lat + "," + json.lng +")");
+			   			var current = [json.lat, json.lng];
+			   			if (marker == null) {
+			   				marker = L.marker([38.797, -77.36], {
+			    				icon: L.mapbox.marker.icon({
+			      					'marker-color': '#f86767'
+			    				})
+							});
+							marker.addTo(map);
+			   			}
+						marker.setLatLng(current);
+						polyline.addLatLng(current);
+			   		},
+			   		error: function(xhr, status, errorThrown) {
+				        console.log( "Error: " + errorThrown );
+			        	console.log( "Status: " + status );
+        				console.dir( xhr );
+			   		}
+			   	});
+			}
+    	</script>
+    </body>
+</html>
